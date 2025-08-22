@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Bubblegum+Sans&display=swap');
 
+/* ... fondo y estructura igual que antes ... */
 body {
   margin: 0;
   font-family: 'Bubblegum Sans', 'Comic Sans MS', cursive, sans-serif;
@@ -68,7 +69,6 @@ section {
   margin-bottom: 2rem;
 }
 
-/* Food cards */
 .food-list {
   display: flex;
   flex-wrap: wrap;
@@ -137,6 +137,20 @@ section {
   padding: 0.7em 1em;
   font-size: 0.95em;
   animation: fadeIn 0.6s;
+  position: relative;
+}
+.history-item .history-delete {
+  position: absolute;
+  top: 0.5em; right: 0.7em;
+  background: none;
+  border: none;
+  color: #f36db8;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.history-item .history-delete:hover {
+  color: #a259e8;
 }
 
 /* Modal config */
@@ -174,6 +188,35 @@ section {
   color: #a259e8;
 }
 
+/* Foods table modal */
+#foods-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+#foods-table th, #foods-table td {
+  padding: 0.6em;
+  text-align: left;
+  border-bottom: 1.5px solid #f7a1e9;
+}
+#foods-table tr:last-child td {
+  border-bottom: none;
+}
+#foods-table td {
+  font-size: 1em;
+}
+#foods-table .food-edit-btn, #foods-table .food-delete-btn {
+  border: none;
+  background: none;
+  color: #f36db8;
+  font-size: 1em;
+  cursor: pointer;
+  margin-right: 0.7em;
+}
+#foods-table .food-edit-btn:hover, #foods-table .food-delete-btn:hover {
+  color: #a259e8;
+}
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(16px);}
@@ -195,9 +238,13 @@ input, select {
   background: #fff6fa;
   box-shadow: 0 1px 3px #a259e822;
 }
-input:focus {
+input:focus, select:focus {
   border: 2px solid #a259e8;
   box-shadow: 0 2px 8px #f7a1e944;
+}
+
+.hidden {
+  display: none !important;
 }
 
 /* Responsive */
