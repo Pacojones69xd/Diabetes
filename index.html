@@ -12,6 +12,7 @@
   <header>
     <h1 class="bubble-title">Calculadora de Azucarillo 🍬</h1>
     <button id="btn-config" class="btn sweet-btn">⚙️ Configuración</button>
+    <button id="btn-manage-foods" class="btn sweet-btn">🍭 Editar Alimentos</button>
   </header>
   <main>
     <section class="user-section">
@@ -24,11 +25,14 @@
     <section class="food-section">
       <h2>Alimentos 🍭</h2>
       <form id="food-form">
-        <input type="text" id="food-name" placeholder="Nombre" list="food-suggestions" required>
-        <datalist id="food-suggestions"></datalist>
+        <select id="food-select">
+          <option value="">Nuevo alimento...</option>
+        </select>
+        <input type="text" id="food-name" placeholder="Nombre" required>
         <input type="number" id="carbs-per-100g" placeholder="Hidratos/100g" min="0" step="0.1" required>
         <input type="number" id="food-weight" placeholder="Peso (g)" min="0" step="1" required>
         <button type="submit" class="btn sweet-btn">Añadir alimento</button>
+        <button type="button" id="btn-add-food-to-table" class="btn sweet-btn">Guardar en tabla</button>
       </form>
       <div id="food-list" class="food-list"></div>
     </section>
@@ -45,9 +49,11 @@
     </section>
     <section class="history-section">
       <h2>Historial de comidas 🍡</h2>
+      <button id="btn-clear-history" class="btn sweet-btn">🗑️ Borrar historial</button>
       <div id="history-list"></div>
     </section>
   </main>
+  <!-- Configuración usuario -->
   <div id="config-modal" class="modal hidden">
     <div class="modal-content">
       <span class="close" id="close-config">&times;</span>
@@ -61,6 +67,32 @@
         <input type="number" id="target-glucose" min="40" max="200" required>
         <button type="submit" class="btn sweet-btn">Guardar</button>
       </form>
+    </div>
+  </div>
+  <!-- Gestión de alimentos -->
+  <div id="manage-foods-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" id="close-manage-foods">&times;</span>
+      <h2>Tabla de alimentos 🍭</h2>
+      <table id="foods-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Hidratos/100g</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div id="edit-food-form-container" class="hidden">
+        <h3>Editar alimento</h3>
+        <form id="edit-food-form">
+          <input type="hidden" id="edit-food-index">
+          <input type="text" id="edit-food-name" required>
+          <input type="number" id="edit-food-carbs" min="0" step="0.1" required>
+          <button type="submit" class="btn sweet-btn">Guardar cambios</button>
+        </form>
+      </div>
     </div>
   </div>
 </body>
