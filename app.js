@@ -1,4 +1,5 @@
-// Calculadora de Azucarillo - main JS
+// Calculadora de Azucarillo - SPA más elaborada
+
 const LS = window.localStorage;
 const DB_FOODS_KEY = "azucarillo_foods";
 const DB_HISTORY_KEY = "azucarillo_history";
@@ -7,24 +8,25 @@ const DB_SESSION_KEY = "azucarillo_session";
 
 // Default user config
 const defaultUser = {
-  ratio: 12, // 1u/12g
-  sensitivity: 40, // 1u baja 40 mg/dl
+  ratio: 12,
+  sensitivity: 40,
   target: 110
 };
 
 let userConfig = loadUserConfig();
-let foodsDB = loadFoodsDB();
+let foodsTable = loadFoodsTable();
 let sessionFoods = loadSessionFoods();
 let mealHistory = loadHistory();
 let currentGlucose = null;
 
-// --- DOM Elements ---
+// DOM elements
 const foodForm = document.getElementById("food-form");
+const foodSelect = document.getElementById("food-select");
 const foodName = document.getElementById("food-name");
 const carbsPer100g = document.getElementById("carbs-per-100g");
 const foodWeight = document.getElementById("food-weight");
+const btnAddFoodToTable = document.getElementById("btn-add-food-to-table");
 const foodList = document.getElementById("food-list");
-const foodSuggestions = document.getElementById("food-suggestions");
 
 const glucoseForm = document.getElementById("glucose-form");
 const currentGlucoseInput = document.getElementById("current-glucose");
@@ -45,17 +47,29 @@ const targetInput = document.getElementById("target-glucose");
 const btnExport = document.getElementById("btn-export");
 const btnShare = document.getElementById("btn-share");
 
+const btnManageFoods = document.getElementById("btn-manage-foods");
+const manageFoodsModal = document.getElementById("manage-foods-modal");
+const closeManageFoods = document.getElementById("close-manage-foods");
+const foodsTableElem = document.getElementById("foods-table").getElementsByTagName("tbody")[0];
+const editFoodFormContainer = document.getElementById("edit-food-form-container");
+const editFoodForm = document.getElementById("edit-food-form");
+const editFoodIndex = document.getElementById("edit-food-index");
+const editFoodName = document.getElementById("edit-food-name");
+const editFoodCarbs = document.getElementById("edit-food-carbs");
+
 const historyList = document.getElementById("history-list");
+const btnClearHistory = document.getElementById("btn-clear-history");
 
 // --- INIT ---
 init();
 
 function init() {
-  renderFoodSuggestions();
+  renderFoodsSelect();
   renderSessionFoods();
   renderTotals();
   renderHistory();
   setupConfigModal();
+  setupManageFoodsModal();
 }
 
 // --- User Config ---
@@ -72,8 +86,8 @@ function saveUserConfig(cfg) {
   LS.setItem(DB_USER_KEY, JSON.stringify(userConfig));
 }
 
-// --- Foods DB ---
-function loadFoodsDB() {
+// --- Foods Table ---
+function loadFoodsTable() {
   const raw = LS.getItem(DB_FOODS_KEY);
   try {
     return raw ? JSON.parse(raw) : [];
@@ -81,16 +95,17 @@ function loadFoodsDB() {
     return [];
   }
 }
-function saveFoodsDB() {
-  LS.setItem(DB_FOODS_KEY, JSON.stringify(foodsDB));
+function saveFoodsTable() {
+  LS.setItem(DB_FOODS_KEY, JSON.stringify(foodsTable));
 }
 
-function renderFoodSuggestions() {
-  foodSuggestions.innerHTML = "";
-  foodsDB.forEach(food => {
+function renderFoodsSelect() {
+  foodSelect.innerHTML = `<option value="">Nuevo alimento...</option>`;
+  foodsTable.forEach((food, idx) => {
     const opt = document.createElement("option");
-    opt.value = food.name;
-    foodSuggestions.appendChild(opt);
+    opt.value = idx;
+    opt.textContent = `${food.name} (${food.carbsPer100g}g/100g)`;
+    foodSelect.appendChild(opt);
   });
 }
 
@@ -143,17 +158,45 @@ foodForm.onsubmit = e => {
   });
   saveSessionFoods();
   renderSessionFoods();
-
-  // Add to food DB if not exists
-  if (!foodsDB.some(f => f.name.toLowerCase() === name.toLowerCase())) {
-    foodsDB.push({ name, carbsPer100g: carbs });
-    saveFoodsDB();
-    renderFoodSuggestions();
-  }
   foodForm.reset();
+  foodSelect.value = "";
   renderTotals();
 };
 
+// --- Add food to table ---
+btnAddFoodToTable.onclick = () => {
+  const name = foodName.value.trim();
+  const carbs = parseFloat(carbsPer100g.value);
+
+  if (!name || isNaN(carbs) || carbs < 0) return;
+
+  // If exists, update. Else, add.
+  const idx = foodsTable.findIndex(f => f.name.toLowerCase() === name.toLowerCase());
+  if (idx >= 0) {
+    foodsTable[idx].carbsPer100g = carbs;
+  } else {
+    foodsTable.push({ name, carbsPer100g: carbs });
+  }
+  saveFoodsTable();
+  renderFoodsSelect();
+  foodForm.reset();
+  foodSelect.value = "";
+};
+
+// --- Select from foods table ---
+foodSelect.onchange = () => {
+  const idx = foodSelect.value;
+  if (idx === "") {
+    foodName.value = "";
+    carbsPer100g.value = "";
+  } else {
+    const food = foodsTable[idx];
+    foodName.value = food.name;
+    carbsPer100g.value = food.carbsPer100g;
+  }
+};
+
+// --- Delete food from session ---
 function deleteSessionFood(idx) {
   sessionFoods.splice(idx, 1);
   saveSessionFoods();
@@ -211,7 +254,6 @@ function setupConfigModal() {
   closeConfig.onclick = () => configModal.classList.add("hidden");
   configForm.onsubmit = e => {
     e.preventDefault();
-    // Save new config
     saveUserConfig({
       ratio: parseFloat(ratioInput.value),
       sensitivity: parseFloat(sensitivityInput.value),
@@ -222,23 +264,62 @@ function setupConfigModal() {
   };
 }
 
-// --- Foods DB: Delete food ---
-foodName.oninput = () => {
-  const val = foodName.value.trim().toLowerCase();
-  const found = foodsDB.find(f => f.name.toLowerCase() === val);
-  if (found) carbsPer100g.value = found.carbsPer100g;
-};
+// --- Manage Foods Modal ---
+function setupManageFoodsModal() {
+  btnManageFoods.onclick = () => {
+    renderFoodsTable();
+    manageFoodsModal.classList.remove("hidden");
+    editFoodFormContainer.classList.add("hidden");
+  };
+  closeManageFoods.onclick = () => {
+    manageFoodsModal.classList.add("hidden");
+    editFoodFormContainer.classList.add("hidden");
+  };
+  editFoodForm.onsubmit = e => {
+    e.preventDefault();
+    const idx = parseInt(editFoodIndex.value);
+    const name = editFoodName.value.trim();
+    const carbs = parseFloat(editFoodCarbs.value);
+    if (isNaN(idx) || !name || isNaN(carbs) || carbs < 0) return;
+    foodsTable[idx] = { name, carbsPer100g: carbs };
+    saveFoodsTable();
+    renderFoodsTable();
+    renderFoodsSelect();
+    editFoodFormContainer.classList.add("hidden");
+  };
+}
 
-foodSuggestions.oncontextmenu = e => {
-  e.preventDefault();
-  const val = e.target.value;
-  if (!val) return;
-  if (confirm(`¿Eliminar alimento "${val}" de la base de datos?`)) {
-    foodsDB = foodsDB.filter(f => f.name !== val);
-    saveFoodsDB();
-    renderFoodSuggestions();
-  }
-};
+function renderFoodsTable() {
+  foodsTableElem.innerHTML = "";
+  foodsTable.forEach((food, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${food.name}</td>
+      <td>${food.carbsPer100g}</td>
+      <td>
+        <button class="food-edit-btn">Editar</button>
+        <button class="food-delete-btn">Eliminar</button>
+      </td>
+    `;
+    tr.querySelector('.food-edit-btn').onclick = () => showEditFoodForm(idx);
+    tr.querySelector('.food-delete-btn').onclick = () => {
+      if (confirm(`¿Eliminar alimento "${food.name}" de la tabla?`)) {
+        foodsTable.splice(idx, 1);
+        saveFoodsTable();
+        renderFoodsTable();
+        renderFoodsSelect();
+      }
+    };
+    foodsTableElem.appendChild(tr);
+  });
+}
+
+function showEditFoodForm(idx) {
+  editFoodFormContainer.classList.remove("hidden");
+  editFoodIndex.value = idx;
+  editFoodName.value = foodsTable[idx].name;
+  editFoodCarbs.value = foodsTable[idx].carbsPer100g;
+}
 
 // --- History ---
 function loadHistory() {
@@ -279,14 +360,28 @@ function renderHistory() {
       <div>
         ${meal.foods.map(f => `<span>${f.name} (${f.weight}g, ${f.carbs.toFixed(1)}g)</span>`).join(", ")}
       </div>
+      <button class="history-delete" title="Eliminar registro">&times;</button>
     `;
+    item.querySelector('.history-delete').onclick = () => {
+      mealHistory.splice(idx, 1);
+      saveHistory();
+      renderHistory();
+    };
     historyList.appendChild(item);
   });
 }
 
+// --- Borrar historial ---
+btnClearHistory.onclick = () => {
+  if (confirm("¿Seguro que quieres borrar todo el historial?")) {
+    mealHistory = [];
+    saveHistory();
+    renderHistory();
+  }
+};
+
 // --- Export PDF ---
 btnExport.onclick = () => {
-  // Simple PDF export using window.print
   window.print();
 };
 
