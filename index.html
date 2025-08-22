@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de Azucarillo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="background"></div>
+  <header>
+    <h1 class="bubble-title">Calculadora de Azucarillo 🍬</h1>
+    <button id="btn-config" class="btn sweet-btn">⚙️ Configuración</button>
+  </header>
+  <main>
+    <section class="user-section">
+      <form id="glucose-form">
+        <label for="current-glucose">Glucemia actual (mg/dl):</label>
+        <input type="number" id="current-glucose" min="40" max="600" required>
+        <button type="submit" class="btn sweet-btn">Calcular Dosis</button>
+      </form>
+    </section>
+    <section class="food-section">
+      <h2>Alimentos 🍭</h2>
+      <form id="food-form">
+        <input type="text" id="food-name" placeholder="Nombre" list="food-suggestions" required>
+        <datalist id="food-suggestions"></datalist>
+        <input type="number" id="carbs-per-100g" placeholder="Hidratos/100g" min="0" step="0.1" required>
+        <input type="number" id="food-weight" placeholder="Peso (g)" min="0" step="1" required>
+        <button type="submit" class="btn sweet-btn">Añadir alimento</button>
+      </form>
+      <div id="food-list" class="food-list"></div>
+    </section>
+    <section class="totals-section fade-in" id="totals-section">
+      <h2>Resumen 🍬</h2>
+      <div class="totals-card">
+        <p>Hidratos totales: <span id="total-carbs">0</span> g</p>
+        <p>Bolo comida: <span id="meal-bolus">0</span> u</p>
+        <p>Corrección: <span id="correction-bolus">0</span> u</p>
+        <p>Dosis total de insulina: <span id="total-insulin">0</span> u</p>
+        <button id="btn-export" class="btn sweet-btn">📄 Exportar PDF</button>
+        <button id="btn-share" class="btn sweet-btn">📲 Compartir WhatsApp</button>
+      </div>
+    </section>
+    <section class="history-section">
+      <h2>Historial de comidas 🍡</h2>
+      <div id="history-list"></div>
+    </section>
+  </main>
+  <div id="config-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" id="close-config">&times;</span>
+      <h2>Configuración de usuario 🍩</h2>
+      <form id="config-form">
+        <label>Relación insulina/hidratos (g por unidad):</label>
+        <input type="number" id="ratio" min="1" step="1" required>
+        <label>Factor de sensibilidad (mg/dl por unidad):</label>
+        <input type="number" id="sensitivity" min="1" step="1" required>
+        <label>Glucemia objetivo (mg/dl):</label>
+        <input type="number" id="target-glucose" min="40" max="200" required>
+        <button type="submit" class="btn sweet-btn">Guardar</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

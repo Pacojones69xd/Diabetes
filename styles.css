@@ -1,0 +1,213 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Bubblegum+Sans&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Bubblegum Sans', 'Comic Sans MS', cursive, sans-serif;
+  background: linear-gradient(135deg, #e9c7f7 0%, #f7a1e9 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.background {
+  position: fixed;
+  left: 0; top: 0;
+  width: 100vw; height: 100vh;
+  z-index: -1;
+  background: url('https://raw.githubusercontent.com/Pacojones69xd/azucarillo-assets/main/candy-bg.svg');
+  opacity: 0.25;
+  background-repeat: repeat;
+  pointer-events: none;
+}
+
+header {
+  text-align: center;
+  padding: 2rem 1rem 0 1rem;
+  margin-bottom: 1rem;
+}
+
+.bubble-title {
+  font-family: 'Pacifico', cursive;
+  font-size: 2.5rem;
+  color: #a259e8;
+  text-shadow: 2px 2px 0 #fff6fa, 5px 5px 10px #f7a1e9;
+  margin-bottom: 0.5rem;
+  letter-spacing: 2px;
+}
+
+.btn {
+  border: none;
+  outline: none;
+  background: linear-gradient(90deg, #e9c7f7 0%, #f7a1e9 100%);
+  color: #a259e8;
+  font-size: 1rem;
+  border-radius: 1.5rem;
+  padding: 0.7em 1.4em;
+  margin: 0.2em;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(190,90,200,0.15);
+  transition: background 0.3s, transform 0.2s;
+}
+.btn:active, .btn:focus {
+  background: linear-gradient(90deg, #f7a1e9 0%, #e9c7f7 100%);
+  transform: scale(1.05);
+}
+
+.sweet-btn {
+  font-weight: bold;
+  font-family: 'Bubblegum Sans', cursive;
+}
+
+main {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+section {
+  margin-bottom: 2rem;
+}
+
+/* Food cards */
+.food-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+}
+.food-card {
+  background: #fff6fa;
+  border-radius: 1.2em;
+  box-shadow: 0 2px 8px #f7a1e9aa;
+  padding: 1em;
+  min-width: 200px;
+  position: relative;
+  font-size: 1.1em;
+  animation: fadeIn 0.6s;
+  transition: box-shadow 0.3s;
+}
+.food-card:hover {
+  box-shadow: 0 4px 16px #a259e8bb;
+}
+.food-card .food-delete {
+  position: absolute;
+  top: 0.5em; right: 0.7em;
+  background: none;
+  border: none;
+  color: #f36db8;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.food-card .food-delete:hover {
+  color: #a259e8;
+}
+
+.totals-card {
+  background: #fff6fa;
+  border-radius: 1.5em;
+  box-shadow: 0 2px 10px #a259e8aa;
+  padding: 1.3em;
+  margin-top: 1em;
+  text-align: center;
+  font-size: 1.1em;
+  animation: fadeIn 0.6s;
+}
+.totals-card span {
+  font-weight: bold;
+  color: #f36db8;
+  font-size: 1.2em;
+}
+
+.history-section {
+  background: #f7a1e9;
+  border-radius: 1.2em;
+  padding: 1em;
+  box-shadow: 0 2px 8px #a259e866;
+}
+#history-list {
+  margin-top: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+}
+.history-item {
+  background: #fff6fa;
+  border-radius: 1em;
+  box-shadow: 0 1px 6px #a259e833;
+  padding: 0.7em 1em;
+  font-size: 0.95em;
+  animation: fadeIn 0.6s;
+}
+
+/* Modal config */
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  z-index: 100;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(162,89,232,0.25);
+  animation: fadeIn 0.4s;
+}
+.modal.hidden {
+  display: none;
+}
+.modal-content {
+  background: #fff6fa;
+  padding: 2em;
+  border-radius: 1.5em;
+  box-shadow: 0 4px 20px #f36db8aa;
+  min-width: 300px;
+  position: relative;
+  font-family: 'Bubblegum Sans', cursive;
+}
+.close {
+  position: absolute;
+  top: 1em; right: 1em;
+  font-size: 1.5em;
+  color: #f36db8;
+  cursor: pointer;
+}
+.close:hover {
+  color: #a259e8;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+.fade-in {
+  animation: fadeIn 0.8s;
+}
+
+/* Inputs */
+input, select {
+  border-radius: 1em;
+  border: 1.5px solid #f36db8;
+  font-size: 1em;
+  padding: 0.6em;
+  margin: 0.3em 0.6em 0.3em 0;
+  outline: none;
+  transition: border 0.3s, box-shadow 0.2s;
+  background: #fff6fa;
+  box-shadow: 0 1px 3px #a259e822;
+}
+input:focus {
+  border: 2px solid #a259e8;
+  box-shadow: 0 2px 8px #f7a1e944;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  main { padding: 0.5rem; }
+  .modal-content { min-width: 90vw; }
+}
+
+@media (max-width: 480px) {
+  header { padding: 1rem 0.5rem 0 0.5rem; }
+  .bubble-title { font-size: 2rem; }
+  .food-card, .totals-card, .history-item { min-width: 90vw; font-size: 1em;}
+}
